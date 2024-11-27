@@ -32,8 +32,8 @@ def init_cloud_logging(
     """Initialize the Google Cloud Logging event message"""
 
     value = {
-        "message": event_dict.pop("event"),
         "time": event_dict.pop("timestamp"),
+        "jsonPayload": {"message": event_dict.pop("event")} | event_dict,
     }
 
     event_dict[CLOUD_LOGGING_KEY] = value
@@ -58,12 +58,6 @@ def finalize_cloud_logging(
     # Override whatever is left from the event dict with the content of all
     # the Google Cloud Logging-formatted fields.
     event_dict.update(gcp_event)
-
-    # Fields which are not known by Google Cloud Logging will be added to
-    # the `jsonPayload` field.
-    #
-    # See the `message` field documentation in:
-    # https://cloud.google.com/logging/docs/structured-logging#special-payload-fields
 
     return event_dict
 
